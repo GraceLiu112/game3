@@ -1,3 +1,10 @@
+import ddf.minim.*;
+import ddf.minim.analysis.*;
+import ddf.minim.effects.*;
+import ddf.minim.signals.*;
+import ddf.minim.spi.*;
+import ddf.minim.ugens.*;
+
 color pink = #EA87BC;
 color purple = #BC87EA;
 color darkblue = #153874;
@@ -15,21 +22,32 @@ final int GAME = 2;
 final int PAUSE = 3;
 final int GAMEOVER = 4;
 
+// sound variables
+Minim minim;
+AudioPlayer theme;
+
 float a;
 float bx, by, bd, vx, vy, px, py, pd;
 boolean akey, dkey;
 int[] x;
 int[] y;
+boolean[] alive;
 int n;
 int tempx, tempy;
 
 int brickd;
+
+int lives;
+int score;
 
 void setup(){
   size(800, 800);
   textAlign(CENTER, CENTER);
   noStroke();
   mode = INTRO;
+  
+  minim = new Minim(this);
+  theme = minim.loadFile("MUSIC.mp3");
   
   bx = width/2;
   by = height - 200;
@@ -39,39 +57,29 @@ void setup(){
   pd = 100;
   vx = 0;
   vy = 1;
-  n = 7;
+  n = 21;
+  lives = 3;
+  score =0;
   x = new int[n];
   y = new int[n];
+  alive = new boolean[n];
   tempx = 100;
-  tempy = 100;
+  tempy = 50;
   int i = 0;
   while(i < n){
     x[i] = tempx;
     y[i] = tempy;
+    alive[i] = true;
     tempx = tempx + 100;
     if(tempx == width){
       tempx = 100;
-      tempy = tempy + 100;
+      tempy = tempy + 70;
     }
     i = i + 1;
   }
-  x[0] = 100;
-  y[0] = 50;
-  x[1] = 200;
-  y[1] = 50;
-  x[2] = 300;
-  y[2] = 50;
-  x[3] = 400;
-  y[3] = 50;
-  x[4] = 500;
-  y[4] = 50;
-  x[5] = 600;
-  y[5] = 50;
-  x[6] = 700;
-  y[6] = 50;
   
-   brickd = 40;
-  
+  brickd = 40;
+  i = 0;
   //animation
   numberOfFrames = 76;
   gif = new PImage[numberOfFrames];
@@ -83,9 +91,6 @@ void setup(){
 }
 
 void draw(){
-  image(gif[f], 0, 0, width, height);
-  f = f + 1;
-  if(f == numberOfFrames) f = 0;
    if(mode == INTRO){
     intro();
   }
